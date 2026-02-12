@@ -1,7 +1,9 @@
 {
 	"cSpell.words": [
+        "COLKEY",
         "Graphy",
-        "pyxel"
+        "pyxel",
+        "pyxres"
     ],
 	"python.analysis.generateWithTypeAnnotation": true,
 	"python.analysis.inlayHints.functionReturnTypes": true,
