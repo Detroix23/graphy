@@ -1,0 +1,10 @@
+LICENSE.md
+README.md
+pyproject.toml
+src/graphy_detroix23/__init__.py
+src/graphy_detroix23/__main__.py
+src/graphy_detroix23.egg-info/PKG-INFO
+src/graphy_detroix23.egg-info/SOURCES.txt
+src/graphy_detroix23.egg-info/dependency_links.txt
+src/graphy_detroix23.egg-info/top_level.txt
+src/graphy_detroix23/app/__init__.py

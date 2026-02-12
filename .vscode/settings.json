@@ -1,0 +1,13 @@
+{
+	"cSpell.words": [
+        "Graphy",
+        "pyxel"
+    ],
+	"python.analysis.generateWithTypeAnnotation": true,
+	"python.analysis.inlayHints.functionReturnTypes": true,
+	"python.analysis.inlayHints.variableTypes": true,
+	"python.analysis.typeCheckingMode": "strict",
+	"editor.detectIndentation": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4
+}
