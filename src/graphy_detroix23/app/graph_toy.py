@@ -95,11 +95,13 @@ class GraphToy:
     parent: 'base.App'
     _register: dict[str, NodeToy]
     selected: NodeToy | None
+    arc_origin: NodeToy | None
 
     def __init__(self, parent: 'base.App') -> None:
         self.parent = parent
         self._register = dict()
         self.selected = None
+        self.arc_origin = None
     
     def __getitem__(self, name: str) -> NodeToy:
         """
@@ -131,6 +133,33 @@ class GraphToy:
         else:
             self.parent.mouse_handler.state = mouse.State.HOLD
 
+    def set_arc_origin(self, node: NodeToy | None) -> None:
+        """
+        Update the selection attribute `selected`.
+        Also updates the mouse.
+        """
+        self.arc_origin = node
+        if node is None:
+            self.parent.mouse_handler.state = mouse.State.SELECT
+        else:
+            self.parent.mouse_handler.state = mouse.State.DRAW
+
+
+
+    def select_node(self, position: tuple[float, float]) -> NodeToy | None:
+        """
+        Return a `NodeToy` if there is one under on `position`, `None` else.
+        """
+        for node in self._register.values():
+            # Check if in radius.
+            if ((position[0] - node.position[0]) ** 2 
+                + (position[1] - node.position[1]) ** 2 
+                <= node.radius ** 2
+            ):
+                return node
+             
+        return None 
+
     def node_selection(self) -> None:
         """
         Handles left mouse click and `NodeToy`s moving.
@@ -138,14 +167,7 @@ class GraphToy:
         # Selection
         if self.selected is None:
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                for node in self._register.values():
-                    # Check if in radius.
-                    if ((pyxel.mouse_x - node.position[0]) ** 2 
-                        + (pyxel.mouse_y - node.position[1]) ** 2 
-                        <= node.radius ** 2
-                    ):
-                        self.set_selection(node)
-                        break
+                self.set_selection(self.select_node((pyxel.mouse_x, pyxel.mouse_y)))
         
         else:
             if pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):
@@ -159,19 +181,43 @@ class GraphToy:
         """
         Handles right mouse click to create new connection between `NodeToy`s.
         """
-        
+        if self.arc_origin is None:
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_RIGHT):
+                self.set_arc_origin(self.select_node((pyxel.mouse_x, pyxel.mouse_y)))
 
+        else:
+            if pyxel.btnr(pyxel.MOUSE_BUTTON_RIGHT):
+                end: NodeToy | None = self.select_node((pyxel.mouse_x, pyxel.mouse_y))
+                if end is not None:
+                    if end in self.arc_origin.get_next():
+                        self.arc_origin.remove_next(end)
+                    else:
+                        self.arc_origin.set_next(end, 1.0)
+
+
+                self.set_arc_origin(None)
 
     def update(self) -> None:
         """
         Update positions, nodes, mouse.
         """
         self.node_selection()
+        self.arcs_tool()
         
     def draw(self) -> None:
         """
         Draw all the nodes of the graph.
         """
+        # Drawing arc
+        if self.arc_origin is not None:
+            pyxel.line(
+                self.arc_origin.position[0],
+                self.arc_origin.position[1],
+                pyxel.mouse_x,
+                pyxel.mouse_y,
+                col=pyxel.COLOR_LIME,
+            )
+
         for node in self._register.values():
             node.draw()
     
