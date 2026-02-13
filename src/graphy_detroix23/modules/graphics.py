@@ -89,6 +89,7 @@ def arrow(
     color: int,
     scale: float = 1.0,
     shorten: float = 0.0,
+    shift: float = 0.0
 ) -> None:
     """
     Draw an arrow from P1(`x1`, `y1`) to P2(`x2`, `y2`).
@@ -107,13 +108,12 @@ def arrow(
 
     # Unit vector
     vector: tuple[float, float] = (math.cos(angle), math.sin(angle))
-
     arrow_distance: float = length - shorten if length > shorten else 0.0
     arrow_position: tuple[float, float] = (x1 + vector[0] * arrow_distance, y1 + vector[1] * arrow_distance)
 
     pyxel.blt(
-        arrow_position[0] + SPRITE_ARROW.offset[0],
-        arrow_position[1] + SPRITE_ARROW.offset[1],
+        arrow_position[0] + SPRITE_ARROW.offset[0] + shift * vector[1],
+        arrow_position[1] + SPRITE_ARROW.offset[1] - shift * vector[0],
         SPRITE_ARROW.image,
         SPRITE_ARROW.position[0],
         SPRITE_ARROW.position[1],
@@ -123,4 +123,10 @@ def arrow(
         scale=scale,
         rotate=math.degrees(angle) + 90.0,
     )
-    pyxel.line(x1, y1, arrow_position[0], arrow_position[1], color)
+    pyxel.line(
+        x1 + shift * vector[1], 
+        y1 - shift * vector[0], 
+        arrow_position[0] + shift * vector[1], 
+        arrow_position[1] - shift * vector[0], 
+        color
+    )

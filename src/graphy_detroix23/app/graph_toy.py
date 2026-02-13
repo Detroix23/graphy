@@ -64,6 +64,7 @@ next={self._next}, position={self.position}, scale={self.scale}, radius={self.ra
                     color=pyxel.COLOR_LIGHT_BLUE,
                     scale=1.0,
                     shorten=neighbor.radius,
+                    shift=5.0,
                 )
 
         # Main circle of the node.
@@ -81,8 +82,8 @@ next={self._next}, position={self.position}, scale={self.scale}, radius={self.ra
 
         # Label.
         pyxel.text(
-            self.position[0],
-            self.position[1],
+            self.position[0] - self.SPRITE_SIZE[0] // 2 + 3,
+            self.position[1] - self.SPRITE_SIZE[1] // 2,
             self.get_name(),
             pyxel.COLOR_DARK_BLUE,
             defaults.FONT_BIG_BLUE,
