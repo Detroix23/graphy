@@ -20,12 +20,14 @@ class GraphToy:
     _register: dict[str, node_toy.NodeToy]
     selected: node_toy.NodeToy | None
     arc_origin: node_toy.NodeToy | None
+    _last_added: str | None
 
     def __init__(self, parent: 'base.App') -> None:
         self.parent = parent
         self._register = dict()
         self.selected = None
         self.arc_origin = None
+        self._last_added = None
     
     def __getitem__(self, name: str) -> node_toy.NodeToy:
         """
@@ -33,12 +35,37 @@ class GraphToy:
         """
         return self._register[name]
 
-    def add(self, name: str) -> None:
+    @property
+    def card(self) -> int:
+        """
+        Returns the _Card_, or the number total of nodes.
+        """
+        return len(self._register)
+
+    def add(
+        self, 
+        name: str, 
+        position: tuple[float, float] = (0.0, 0.0),
+    ) -> None:
         """
         Add a new `Node` with a `name` and no neighbors to the `_register`.
         """
-        self._register[name] = node_toy.NodeToy(name)
+        self._last_added = name
+        node = node_toy.NodeToy(name)
+        node.position = position
+        self._register[name] = node
     
+    def add_continuing(
+        self, 
+        position: tuple[float, float] = (0.0, 0.0)
+    ) -> None:
+        """
+        Add a new `Node` and no neighbors to the `_register`.  
+        Name is the following ASCII character after `_last_added`.
+        """
+        name: str = "A" if self._last_added is None else chr(ord(self._last_added) + 1)
+        self.add(name, position)
+
     def remove(self, name: str) -> node_toy.NodeToy | None:
         """
         Remove a `Node` `name` from the `_register`.   
@@ -135,12 +162,22 @@ class GraphToy:
 
                 self.set_arc_origin(None)
 
+    def node_creation(self) -> None:
+        if pyxel.btnp(pyxel.MOUSE_BUTTON_MIDDLE):
+            selection: node_toy.NodeToy | None = self.select_node((pyxel.mouse_x, pyxel.mouse_y))
+            if selection is None:
+                self.add_continuing((pyxel.mouse_x, pyxel.mouse_y))
+
+            else:
+                self.remove(selection.get_name())
+
     def update(self) -> None:
         """
         Update positions, nodes, mouse.
         """
         self.node_selection()
         self.arcs_tool()
+        self.node_creation()
         
     def draw(self) -> None:
         """
