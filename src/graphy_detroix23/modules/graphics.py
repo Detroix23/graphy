@@ -81,6 +81,19 @@ def signum(number: float | int) -> int:
     else:
         return 1
 
+def clip(number: float, minimum: float | None = None, maximum: float | None = None) -> float:
+    """
+    Clip the given `number` between `minimum` and `maximum`.
+    """
+    if minimum is not None and number < minimum:
+        return minimum
+    
+    if maximum is not None and number > maximum:
+        return maximum
+    
+    return number
+
+
 def arrow(
     x1: float, 
     y1: float, 
@@ -130,3 +143,40 @@ def arrow(
         arrow_position[1] - shift * vector[0], 
         color
     )
+
+def jagged_line(
+    x1: float,
+    y1: float,
+    x2: float,
+    y2: float,
+    jag: float,
+    color: int,
+    shift: float = 0.0
+) -> None:
+    """
+    Draw a jagged line, with `jag`s.
+    """
+    vector: tuple[float, float] = (x2 - x1, y2 - y1)
+    length: float = math.sqrt(vector[0] * vector[0] + vector[1] * vector[1])
+    normal: tuple[float, float] = (vector[0] / length, vector[1] / length)
+    t: float = shift
+
+    while t + 2 * jag < length:
+        pyxel.line(
+            x1 + t * normal[0],
+            y1 + t * normal[1],
+            x1 + (t + jag) * normal[0],
+            y1 + (t + jag) * normal[1],
+            color,
+        )
+        t += 2 * jag
+    
+    pyxel.line(
+        x1 + t * normal[0],
+        y1 + t * normal[1],
+        x1 + clip(t + jag, maximum=length) * normal[0],
+        y1 + clip(t + jag, maximum=length) * normal[1],
+        color,
+    )
+
+    
