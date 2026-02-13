@@ -59,7 +59,7 @@ next={self._next}, position={self.position}, scale={self.scale}, radius={self.ra
                     self.position[1],
                     neighbor.position[0],
                     neighbor.position[1],
-                    col=3
+                    col=pyxel.COLOR_LIGHT_BLUE
                 )
 
         # Main circle of the node.
@@ -81,7 +81,7 @@ next={self._next}, position={self.position}, scale={self.scale}, radius={self.ra
             self.position[0],
             self.position[1],
             self.get_name(),
-            1,
+            pyxel.COLOR_DARK_BLUE,
             defaults.FONT_BIG_BLUE,
         )
 
@@ -131,10 +131,9 @@ class GraphToy:
         else:
             self.parent.mouse_handler.state = mouse.State.HOLD
 
-
-    def update(self) -> None:
+    def node_selection(self) -> None:
         """
-        Update positions, nodes, mouse.
+        Handles left mouse click and `NodeToy`s moving.
         """
         # Selection
         if self.selected is None:
@@ -156,7 +155,19 @@ class GraphToy:
         if self.selected is not None:
             self.selected.position = (pyxel.mouse_x, pyxel.mouse_y)
 
+    def arcs_tool(self) -> None:
+        """
+        Handles right mouse click to create new connection between `NodeToy`s.
+        """
+        
 
+
+    def update(self) -> None:
+        """
+        Update positions, nodes, mouse.
+        """
+        self.node_selection()
+        
     def draw(self) -> None:
         """
         Draw all the nodes of the graph.

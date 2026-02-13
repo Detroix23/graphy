@@ -28,7 +28,7 @@ class App:
         """
         self.graph = graph_toy.GraphToy(self)
         self.mouse_handler = mouse.Mouse(self)
-        self.background_color = 0
+        self.background_color = pyxel.COLOR_BLACK
 
         pyxel.init(
             width,
