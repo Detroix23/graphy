@@ -141,7 +141,10 @@ class GraphToy:
         
         # Moving the selection.
         if self.selected is not None:
-            self.selected.position = (pyxel.mouse_x, pyxel.mouse_y)
+            self.selected.position = (
+                graphics.clip(pyxel.mouse_x, minimum=0.0, maximum=pyxel.width), 
+                graphics.clip(pyxel.mouse_y, minimum=0.0, maximum=pyxel.height)
+            )
 
     def arcs_tool(self) -> None:
         """
@@ -163,6 +166,9 @@ class GraphToy:
                 self.set_arc_origin(None)
 
     def node_creation(self) -> None:
+        """
+        Handles middle mouse button to create a new node, named automatically.
+        """
         if pyxel.btnp(pyxel.MOUSE_BUTTON_MIDDLE):
             selection: node_toy.NodeToy | None = self.select_node((pyxel.mouse_x, pyxel.mouse_y))
             if selection is None:
@@ -170,6 +176,10 @@ class GraphToy:
 
             else:
                 self.remove(selection.get_name())
+
+            print("\nNode update.")
+            print(self.display_register())
+            print(self.display_adjacency())
 
     def update(self) -> None:
         """
@@ -207,3 +217,56 @@ class GraphToy:
         """
         return "GraphToy._register: \n" + ", \n".join([f"{name}: {node.display('  ')}" for name, node in self._register.items()])
         
+    def display_adjacency(self) -> str:
+        """
+        Get a formatted string of the adjacency matrix.
+        """
+        matrix: list[list[float]] = list()
+        heads: list[node_toy.NodeToy] = [node for node in self._register.values()]
+        columns_size: list[int] = [0 for _ in range(len(heads))]
+        column_separator: str = "│"
+
+        for head in heads:
+            adjacency: list[float] = list()
+            for index in range(len(heads)):
+                if heads[index] in head.get_next():
+                    adjacency.append(head.get_next()[heads[index]])
+                else:
+                    adjacency.append(0)
+            matrix.append(adjacency)
+
+        # Get sizes.
+        for index in range(len(heads)):
+            head = str(heads[index].get_name())
+            if len(head) > columns_size[index]:
+                columns_size[index] = len(head)
+
+        for index_row in range(len(matrix)):
+            for index_column in range(len(matrix[index_row])):
+                weight: str = str(matrix[index_row][index_column])
+                if len(weight) > columns_size[index_column]:
+                    columns_size[index_column] = len(weight)
+
+        total_length: int = 3
+        row_separator: str = "\n─┼"
+        for size in columns_size:
+            total_length += size + 1
+            row_separator += "─" * size + "┼"
+
+        row_separator += "\n"
+
+        # Format.
+        table: list[str] = [" " + column_separator + column_separator.join([
+            graphics.justify(heads[index_column].get_name(), columns_size[index_column]) 
+            for index_column in range(len(heads))
+        ])]
+
+        for index_row in range(len(matrix)):
+            line: str = heads[index_row].get_name() + column_separator
+            for index_column in range(len(matrix[index_row])):
+                weight: str = str(matrix[index_row][index_column])
+                line += graphics.justify(weight, columns_size[index_column]) + column_separator
+            
+            table.append(line)
+
+        return row_separator.join(table)

@@ -93,6 +93,15 @@ def clip(number: float, minimum: float | None = None, maximum: float | None = No
     
     return number
 
+def justify(string: str, total_length: int, fill: str = ' ') -> str:
+    """
+    Add spaces to the right of the `string` to match the `total_length`.
+    """
+    delta: int = total_length - len(string)
+    if delta < 1:
+        return string
+    
+    return string + fill * delta
 
 def arrow(
     x1: float, 
@@ -158,7 +167,11 @@ def jagged_line(
     """
     vector: tuple[float, float] = (x2 - x1, y2 - y1)
     length: float = math.sqrt(vector[0] * vector[0] + vector[1] * vector[1])
-    normal: tuple[float, float] = (vector[0] / length, vector[1] / length)
+    normal: tuple[float, float] = (
+        (vector[0] / length, vector[1] / length)
+        if length > 0
+        else (0.0, 0.0) 
+    )
     t: float = shift
 
     while t + 2 * jag < length:
@@ -170,7 +183,7 @@ def jagged_line(
             color,
         )
         t += 2 * jag
-    
+
     pyxel.line(
         x1 + t * normal[0],
         y1 + t * normal[1],
