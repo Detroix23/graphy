@@ -6,7 +6,7 @@
 import pyxel
 
 from graphy_detroix23.modules import defaults
-from graphy_detroix23.app import graph_toy, mouse
+from graphy_detroix23.app import graph_toy, mouse, buttons
  
 class App:
     """
@@ -16,6 +16,7 @@ class App:
     graph: graph_toy.GraphToy
     mouse_handler: mouse.Mouse
     background_color: int
+    widgets: list[buttons.Button]
 
     def __init__(
         self,
@@ -29,6 +30,7 @@ class App:
         self.graph = graph_toy.GraphToy(self)
         self.mouse_handler = mouse.Mouse(self)
         self.background_color = pyxel.COLOR_BLACK
+        self.widgets = self.load_widgets()
 
         pyxel.init(
             width,
@@ -42,6 +44,35 @@ class App:
 
         self.first()
 
+    def load_widgets(self) -> list[buttons.Button]:
+        """
+        Initialize the buttons
+        """
+        return [
+            buttons.Button(
+                (10.0, 10.0),
+                (100.0, 60.0),
+                ["Clicky 1"],
+                lambda button: print("Clicky 1 pressed."),
+                color=pyxel.COLOR_GRAY,
+                color_clicked=pyxel.COLOR_WHITE,
+                font=defaults.FONT_BIG_BLUE,
+                margin=(10.0, 10.0),
+            ),
+            buttons.Button(
+                (10.0, 110.0),
+                (100.0, 60.0),
+                ["Clicky 2", "is long !"],
+                lambda button: print("Clicky 2 pressed."),
+                color=pyxel.COLOR_GRAY,
+                color_clicked=pyxel.COLOR_WHITE,
+                font=defaults.FONT_BIG_BLUE,
+                margin=(10.0, 10.0),
+            )
+        ]
+
+
+ 
     def first(self) -> None:
         """
         First actions, taken 1 time only, just before the start of the game loop.
@@ -73,6 +104,9 @@ class App:
         """
         self.graph.update()
 
+        for widget in self.widgets:
+            widget.update()
+
     def draw(self) -> None:
         """
         Application general periodic drawing, in the game loop. 
@@ -80,7 +114,12 @@ class App:
         pyxel.cls(self.background_color)
 
         self.graph.draw()
+
+        for widget in self.widgets:
+            widget.draw()
+
         self.mouse_handler.draw()
+
 
 def main() -> None:
     """
