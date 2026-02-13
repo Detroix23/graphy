@@ -49,6 +49,11 @@ class App:
         self.graph.add("A")
         self.graph.add("B")
         self.graph.add("C")
+        
+        self.graph["A"].batch_next((
+            (self.graph["B"], 1.0),
+            (self.graph["C"], 1.0)
+        ))
 
         print(self.graph.display_register())
 

@@ -51,17 +51,42 @@ next={self._next}, position={self.position}, scale={self.scale}, radius={self.ra
         """
         Draw this `NodeToy`.
         """
+        # Arcs.
+        for neighbor in self.get_next().keys():
+            if isinstance(neighbor, NodeToy):
+                pyxel.line(
+                    self.position[0],
+                    self.position[1],
+                    neighbor.position[0],
+                    neighbor.position[1],
+                    col=3
+                )
+
+        # Main circle of the node.
+        scale: float = self.radius / 16 * self.scale
         pyxel.blt(
-            self.position[0],
-            self.position[1],
+            self.position[0] - scale / 2,
+            self.position[1] - scale / 2,
             self.SPRITE_IMAGE,
             self.SPRITE_POSITION[0],
             self.SPRITE_POSITION[1],
             self.SPRITE_SIZE[0],
             self.SPRITE_SIZE[1],
             self.SPRITE_COLKEY,
-            scale=self.radius / 16 * self.scale,
+            scale=scale,
         )
+
+        # Label.
+        pyxel.text(
+            self.position[0],
+            self.position[1],
+            self.get_name(),
+            1,
+            defaults.FONT_BIG_BLUE,
+        )
+
+        
+
 
 class GraphToy:
     """
@@ -76,6 +101,12 @@ class GraphToy:
         self._register = dict()
         self.selected = None
     
+    def __getitem__(self, name: str) -> NodeToy:
+        """
+        Return a `NodeToy` named `name`. Raise if it doesn't exist.
+        """
+        return self._register[name]
+
     def add(self, name: str) -> None:
         """
         Add a new `Node` with a `name` and no neighbors to the `_register`.
@@ -96,10 +127,8 @@ class GraphToy:
         """
         self.selected = node
         if node is None:
-            print(f"graph.set_selection() selected node: None")
             self.parent.mouse_handler.state = mouse.State.SELECT
         else:
-            print(f"graph.set_selection() selected node: {node}")
             self.parent.mouse_handler.state = mouse.State.HOLD
 
 
