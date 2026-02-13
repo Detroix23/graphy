@@ -26,8 +26,8 @@ class App:
         """
         Initialize the application and default settings.
         """
-        self.graph = graph_toy.GraphToy()
-        self.mouse_handler = mouse.Mouse()
+        self.graph = graph_toy.GraphToy(self)
+        self.mouse_handler = mouse.Mouse(self)
         self.background_color = 0
 
         pyxel.init(
@@ -56,14 +56,15 @@ class App:
         """
         Starts, runs the application.
         """
-
+        pyxel.mouse(False)
         pyxel.run(self.update, self.draw)
 
     def update(self) -> None:
         """
         Application general periodic updating, in the game loop. 
         """
-    
+        self.graph.update()
+
     def draw(self) -> None:
         """
         Application general periodic drawing, in the game loop. 

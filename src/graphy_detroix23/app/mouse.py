@@ -4,9 +4,16 @@
 """
 
 import enum
+from typing import TYPE_CHECKING
+
 import pyxel
 
-from graphy_detroix23.modules import defaults
+if TYPE_CHECKING:
+    from graphy_detroix23.app import base
+from graphy_detroix23.modules import (
+    defaults,
+    graphics,
+)
 
 class State(enum.Enum):
     """
@@ -20,17 +27,28 @@ class Mouse:
     """
     # `Mouse` track, graphics for the `App`.
     """
-    SELECT_POSITION: tuple[int, int] = (16, 0)
-    HOLD_POSITION: tuple[int, int] = (16, 0)
-    SPRITE_SIZE: tuple[int, int] = (16, 16)
-    SPRITE_IMAGE: int = 0
-    SPRITE_COLKEY: int = defaults.COLKEY
+    SPRITE_SELECT: graphics.Sprite = graphics.Sprite(
+        0,
+        (16, 0),
+        (16, 16),
+        defaults.COLKEY,
+        (8.0, 8.0),
+    )
+    SPRITE_HOLD: graphics.Sprite = graphics.Sprite(
+        0,
+        (32, 0),
+        (16, 16),
+        defaults.COLKEY,
+        (0.0, 0.0),
+    )
 
+    parent: 'base.App'
     shown: bool
     state: State
     size: float
 
-    def __init__(self) -> None:
+    def __init__(self, parent: 'base.App') -> None:
+        self.parent = parent
         self.shown = True
         self.state = State.SELECT
         self.size = 2.0
@@ -41,19 +59,30 @@ class Mouse:
         """
         position: tuple[int, int]
         if self.state == State.SELECT:
-            position = self.SELECT_POSITION
+            position = self.SPRITE_SELECT.position
+            pyxel.blt(
+                pyxel.mouse_x + self.SPRITE_SELECT.offset[0],
+                pyxel.mouse_y + self.SPRITE_SELECT.offset[1],
+                self.SPRITE_SELECT.image,
+                position[0],
+                position[1],
+                self.SPRITE_SELECT.size[0],
+                self.SPRITE_SELECT.size[1],
+                self.SPRITE_SELECT.colkey,
+                scale=self.size,
+            )
         else:
-            position = self.HOLD_POSITION
+            position = self.SPRITE_HOLD.position
+            pyxel.blt(
+                pyxel.mouse_x + self.SPRITE_HOLD.offset[0],
+                pyxel.mouse_y + self.SPRITE_HOLD.offset[1],
+                self.SPRITE_HOLD.image,
+                position[0],
+                position[1],
+                self.SPRITE_HOLD.size[0],
+                self.SPRITE_HOLD.size[1],
+                self.SPRITE_HOLD.colkey,
+                scale=self.size,
+            )
 
-        pyxel.blt(
-            pyxel.mouse_x,
-            pyxel.mouse_y,
-            self.SPRITE_IMAGE,
-            position[0],
-            position[1],
-            self.SPRITE_SIZE[0],
-            self.SPRITE_SIZE[1],
-            self.SPRITE_COLKEY,
-            scale=self.size,
-        )
-    
+        
