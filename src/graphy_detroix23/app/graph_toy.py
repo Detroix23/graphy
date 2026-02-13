@@ -10,7 +10,7 @@ import pyxel
 if TYPE_CHECKING:
     from graphy_detroix23.app import base
 import structures_detroix23 as structures
-from graphy_detroix23.modules import defaults
+from graphy_detroix23.modules import defaults, graphics
 from graphy_detroix23.app import mouse
 
 class NodeToy(structures.nodes.Node):
@@ -51,22 +51,25 @@ next={self._next}, position={self.position}, scale={self.scale}, radius={self.ra
         """
         Draw this `NodeToy`.
         """
+        scale: float = self.radius / self.SPRITE_SIZE[0] * self.scale
+
         # Arcs.
         for neighbor in self.get_next().keys():
             if isinstance(neighbor, NodeToy):
-                pyxel.line(
+                graphics.arrow(
                     self.position[0],
                     self.position[1],
                     neighbor.position[0],
                     neighbor.position[1],
-                    col=pyxel.COLOR_LIGHT_BLUE
+                    color=pyxel.COLOR_LIGHT_BLUE,
+                    scale=1.0,
+                    shorten=neighbor.radius,
                 )
 
         # Main circle of the node.
-        scale: float = self.radius / 16 * self.scale
         pyxel.blt(
-            self.position[0] - scale / 2,
-            self.position[1] - scale / 2,
+            self.position[0] - self.SPRITE_SIZE[0] // 2,
+            self.position[1] - self.SPRITE_SIZE[1] // 2,
             self.SPRITE_IMAGE,
             self.SPRITE_POSITION[0],
             self.SPRITE_POSITION[1],
@@ -84,8 +87,6 @@ next={self._next}, position={self.position}, scale={self.scale}, radius={self.ra
             pyxel.COLOR_DARK_BLUE,
             defaults.FONT_BIG_BLUE,
         )
-
-        
 
 
 class GraphToy:
@@ -137,7 +138,7 @@ class GraphToy:
         """
         Update the selection attribute `selected`.
         Also updates the mouse.
-        """
+        """ 
         self.arc_origin = node
         if node is None:
             self.parent.mouse_handler.state = mouse.State.SELECT

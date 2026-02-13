@@ -68,16 +68,14 @@ class Mouse:
         """
         Draw the cursor, according to the state.
         """
-        position: tuple[int, int]
 
         if self.state == State.HOLD:
-            position = self.SPRITE_HOLD.position
             pyxel.blt(
                 pyxel.mouse_x + self.SPRITE_HOLD.offset[0],
                 pyxel.mouse_y + self.SPRITE_HOLD.offset[1],
                 self.SPRITE_HOLD.image,
-                position[0],
-                position[1],
+                self.SPRITE_HOLD.position[0],
+                self.SPRITE_HOLD.position[1],
                 self.SPRITE_HOLD.size[0],
                 self.SPRITE_HOLD.size[1],
                 self.SPRITE_HOLD.colkey,
@@ -85,13 +83,12 @@ class Mouse:
             )
         
         elif self.state == State.DRAW:
-            position = self.SPRITE_DRAW.position
             pyxel.blt(
                 pyxel.mouse_x + self.SPRITE_DRAW.offset[0],
                 pyxel.mouse_y + self.SPRITE_DRAW.offset[1],
                 self.SPRITE_DRAW.image,
-                position[0],
-                position[1],
+                self.SPRITE_DRAW.position[0],
+                self.SPRITE_DRAW.position[1],
                 self.SPRITE_DRAW.size[0],
                 self.SPRITE_DRAW.size[1],
                 self.SPRITE_DRAW.colkey,
@@ -99,13 +96,12 @@ class Mouse:
             )
         
         else:
-            position = self.SPRITE_SELECT.position
             pyxel.blt(
                 pyxel.mouse_x + self.SPRITE_SELECT.offset[0],
                 pyxel.mouse_y + self.SPRITE_SELECT.offset[1],
                 self.SPRITE_SELECT.image,
-                position[0],
-                position[1],
+                self.SPRITE_SELECT.position[0],
+                self.SPRITE_SELECT.position[1],
                 self.SPRITE_SELECT.size[0],
                 self.SPRITE_SELECT.size[1],
                 self.SPRITE_SELECT.colkey,
