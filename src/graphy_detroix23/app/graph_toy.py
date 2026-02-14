@@ -272,3 +272,17 @@ class GraphToy:
             table.append(line)
 
         return row_separator.join(table)
+
+    def display_dict(self, tab: str = "  ") -> str:
+        """
+        Get the dictionary of neighbors.
+        """
+        lines: list[str] = ["{"]
+        for name, node in self._register.items():
+            following: list[str] = [
+                f"{node.get_name()}: {weight}" 
+                for node, weight in node.get_next().items()
+            ]
+            lines.append(f"{tab}{name}: \x7b{', '.join(following)}\x7d")
+        
+        return ", \n".join(lines)

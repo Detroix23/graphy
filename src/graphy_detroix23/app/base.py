@@ -52,9 +52,9 @@ class App:
             buttons.Button(
                 (10.0, 10.0),
                 (140.0, 30.0),
-                ["Print dict"],
-                lambda _: print(f"\nDictionary:\n{self.graph.display_register()}"),
-                color=pyxel.COLOR_GRAY,
+                ["Print dict."],
+                lambda _: print(f"\nDictionary:\n{self.graph.display_dict()}"),
+                color=pyxel.COLOR_PEACH,
                 color_clicked=pyxel.COLOR_WHITE,
                 font=defaults.FONT_BIG_BLUE,
                 margin=(10.0, 10.0),
@@ -62,13 +62,23 @@ class App:
             buttons.Button(
                 (10.0, 45.0),
                 (140.0, 30.0),
-                ["Print adjacency"],
+                ["Print adjacency."],
                 lambda _: print(f"\nAdjacency matrix:\n{self.graph.display_adjacency()}"),
-                color=pyxel.COLOR_GRAY,
+                color=pyxel.COLOR_ORANGE,
                 color_clicked=pyxel.COLOR_WHITE,
                 font=defaults.FONT_BIG_BLUE,
                 margin=(10.0, 10.0),
-            )
+            ),
+            buttons.Button(
+                (10.0, 80.0),
+                (140.0, 30.0),
+                ["Defaults."],
+                lambda _: self.graph.default_position(100.0 + self.graph.card),
+                color=pyxel.COLOR_CYAN,
+                color_clicked=pyxel.COLOR_WHITE,
+                font=defaults.FONT_BIG_BLUE,
+                margin=(10.0, 10.0),
+            ),
         ]
  
     def first(self) -> None:
