@@ -51,27 +51,25 @@ class App:
         return [
             buttons.Button(
                 (10.0, 10.0),
-                (100.0, 60.0),
-                ["Clicky 1"],
-                lambda button: print("Clicky 1 pressed."),
+                (140.0, 30.0),
+                ["Print dict"],
+                lambda _: print(f"\nDictionary:\n{self.graph.display_register()}"),
                 color=pyxel.COLOR_GRAY,
                 color_clicked=pyxel.COLOR_WHITE,
                 font=defaults.FONT_BIG_BLUE,
                 margin=(10.0, 10.0),
             ),
             buttons.Button(
-                (10.0, 110.0),
-                (100.0, 60.0),
-                ["Clicky 2", "is long !"],
-                lambda button: print("Clicky 2 pressed."),
+                (10.0, 45.0),
+                (140.0, 30.0),
+                ["Print adjacency"],
+                lambda _: print(f"\nAdjacency matrix:\n{self.graph.display_adjacency()}"),
                 color=pyxel.COLOR_GRAY,
                 color_clicked=pyxel.COLOR_WHITE,
                 font=defaults.FONT_BIG_BLUE,
                 margin=(10.0, 10.0),
             )
         ]
-
-
  
     def first(self) -> None:
         """
@@ -125,6 +123,10 @@ def main() -> None:
     """
     Default launch.
     """
-    app = App(700, 500, 30)
+    app = App(
+        width=700, 
+        height=500, 
+        fps=30,
+    )
     
     app.run()

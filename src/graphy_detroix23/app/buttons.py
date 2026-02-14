@@ -3,6 +3,7 @@
 /src/graphy_detroix23/app/buttons.py
 """
 
+import math
 from typing import Callable, Self
 
 import pyxel
@@ -19,7 +20,9 @@ class Button:
     color_clicked: int
     font: pyxel.Font | None
     margin: tuple[float, float]
-    _is_clicked: bool
+    # Duration in frames.
+    _click_time: int
+    _click_effect_duration: int
 
     def __init__(
         self,
@@ -40,26 +43,31 @@ class Button:
         self.color_clicked = color_clicked
         self.font = font      
         self.margin = margin
-        self._is_clicked = False
+        self._click_time = 0
+        self._click_effect_duration = 6
 
     def draw(self) -> None:
         """
         Draw the button to the screen.
         """
-        if self._is_clicked:
+        scale: float = 4.0 * math.log(self._click_time + 1)
+
+        if 2 * self._click_time > 0:
+            pyxel.dither(min((self._click_time + 1) / self._click_effect_duration, 1.0))
             pyxel.rect(
-                self.position[0],
-                self.position[1],
-                self.size[0],
-                self.size[1],
+                self.position[0] - scale,
+                self.position[1] - scale,
+                self.size[0] + 2 * scale,
+                self.size[1] + 2 * scale,
                 self.color_clicked,
             )
+            pyxel.dither(1.0)
 
         pyxel.rectb(
-            self.position[0],
-            self.position[1],
-            self.size[0],
-            self.size[1],
+            self.position[0] - scale,
+            self.position[1] - scale,
+            self.size[0] + 2 * scale,
+            self.size[1] + 2 * scale,
             self.color,
         )
         for index in range(len(self.text)):
@@ -71,7 +79,6 @@ class Button:
                 self.font,
             )
 
-
     def update(self) -> None:
         """
         Update the button: listen to click and execute the `action`.
@@ -82,19 +89,7 @@ class Button:
                 and pyxel.mouse_y > self.position[1] and pyxel.mouse_y < self.position[1] + self.size[1]
             ):
                 self.action(self)
-                self._is_clicked = True
-        
-        elif pyxel.btn(pyxel.MOUSE_BUTTON_LEFT):
-            if (
-                pyxel.mouse_x > self.position[0] and pyxel.mouse_x < self.position[0] + self.size[0]
-                and pyxel.mouse_y > self.position[1] and pyxel.mouse_y < self.position[1] + self.size[1]
-            ):
-                self._is_clicked = True
-        
-        else:
-            if (
-                pyxel.mouse_x > self.position[0] and pyxel.mouse_x < self.position[0] + self.size[0]
-                and pyxel.mouse_y > self.position[1] and pyxel.mouse_y < self.position[1] + self.size[1]
-            ):
-                self._is_clicked = False
-    
+                self._click_time = self._click_effect_duration
+
+        if self._click_time > 0:
+            self._click_time -= 1

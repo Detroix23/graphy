@@ -93,11 +93,19 @@ class GraphToy:
         Update the selection attribute `selected`.
         Also updates the mouse.
         """
-        self.selected = node
+        # Removes the hold selection.
+        if self.selected is not None:
+            self.selected.is_selected = False
+
         if node is None:
             self.parent.mouse_handler.state = mouse.State.SELECT
         else:
             self.parent.mouse_handler.state = mouse.State.HOLD
+            node.is_selected = True
+
+        self.selected = node
+
+        return
 
     def set_arc_origin(self, node: node_toy.NodeToy | None) -> None:
         """
@@ -109,8 +117,6 @@ class GraphToy:
             self.parent.mouse_handler.state = mouse.State.SELECT
         else:
             self.parent.mouse_handler.state = mouse.State.DRAW
-
-
 
     def select_node(self, position: tuple[float, float]) -> node_toy.NodeToy | None:
         """
@@ -176,10 +182,6 @@ class GraphToy:
 
             else:
                 self.remove(selection.get_name())
-
-            print("\nNode update.")
-            print(self.display_register())
-            print(self.display_adjacency())
 
     def update(self) -> None:
         """

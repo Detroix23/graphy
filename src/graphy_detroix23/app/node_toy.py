@@ -23,6 +23,7 @@ class NodeToy(structures.nodes.Node):
     radius: float
     # Sprite scale.
     scale: float
+    is_selected: bool
 
     def __init__(
         self,
@@ -37,6 +38,7 @@ class NodeToy(structures.nodes.Node):
         self.position = (100.0, 100.0)
         self.radius = 32
         self.scale = 1.0
+        self.is_selected = False
 
     def __repr__(self) -> str:
         return f"Node(name={self._name}, id={self._id}, previous={self._previous}, \
@@ -47,6 +49,9 @@ next={self._next}, position={self.position}, scale={self.scale}, radius={self.ra
         Draw this `NodeToy`.
         """
         scale: float = self.radius / self.SPRITE_SIZE[0] * self.scale
+
+        if self.is_selected:
+            pyxel.dither(0.8)
 
         # Arcs.
         for neighbor in self.get_next().keys():
@@ -84,3 +89,4 @@ next={self._next}, position={self.position}, scale={self.scale}, radius={self.ra
             defaults.FONT_BIG_BLUE,
         )
 
+        pyxel.dither(1.0)
