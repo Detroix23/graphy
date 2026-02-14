@@ -44,7 +44,7 @@ class NodeToy(structures.nodes.Node):
         return f"Node(name={self._name}, id={self._id}, previous={self._previous}, \
 next={self._next}, position={self.position}, scale={self.scale}, radius={self.radius})"
 
-    def draw(self) -> None:
+    def draw(self, show_weights: bool) -> None:
         """
         Draw this `NodeToy`.
         """
@@ -54,7 +54,7 @@ next={self._next}, position={self.position}, scale={self.scale}, radius={self.ra
             pyxel.dither(0.8)
 
         # Arcs.
-        for neighbor in self.get_next().keys():
+        for neighbor, weight in self.get_next().items():
             if isinstance(neighbor, NodeToy):
                 graphics.arrow(
                     self.position[0],
@@ -66,6 +66,15 @@ next={self._next}, position={self.position}, scale={self.scale}, radius={self.ra
                     shorten=neighbor.radius,
                     shift=5.0,
                 )
+
+                if show_weights:
+                    pyxel.text(
+                        (self.position[0] + neighbor.position[0]) / 2,
+                        (self.position[1] + neighbor.position[1]) / 2,
+                        str(weight),
+                        col=pyxel.COLOR_NAVY,
+                        font=defaults.FONT_BIG_BLUE,
+                    )
 
         # Main circle of the node.
         pyxel.blt(

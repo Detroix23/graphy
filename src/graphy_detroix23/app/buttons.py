@@ -18,6 +18,7 @@ class Button:
     action: Callable[[Self], None]
     color: int
     color_clicked: int
+    sound: str | None
     font: pyxel.Font | None
     margin: tuple[float, float]
     # Duration in frames.
@@ -32,15 +33,23 @@ class Button:
         action: Callable[[Self], None],
         color: int,
         color_clicked: int = pyxel.COLOR_WHITE,
+        sound: str | None = None,
         font: pyxel.Font | None = None,
         margin: tuple[float, float] = (0.0, 0.0)
     ) -> None:
+        """
+        Create a `Button`.
+
+        Arguments:
+        - `sound`: `str`, MML string.
+        """
         self.position = position
         self.size = size
         self.text = text
         self.action = action
         self.color = color
         self.color_clicked = color_clicked
+        self.sound = sound
         self.font = font      
         self.margin = margin
         self._click_time = 0
@@ -90,6 +99,9 @@ class Button:
             ):
                 self.action(self)
                 self._click_time = self._click_effect_duration
+                
+                if self.sound is not None:
+                    pyxel.play(1, self.sound)
 
         if self._click_time > 0:
             self._click_time -= 1

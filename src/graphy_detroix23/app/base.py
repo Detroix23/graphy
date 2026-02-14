@@ -56,6 +56,7 @@ class App:
                 lambda _: print(f"\nDictionary:\n{self.graph.display_dict()}"),
                 color=pyxel.COLOR_PEACH,
                 color_clicked=pyxel.COLOR_WHITE,
+                sound="T120 L4 Q10 V8 <<B",
                 font=defaults.FONT_BIG_BLUE,
                 margin=(10.0, 10.0),
             ),
@@ -66,6 +67,7 @@ class App:
                 lambda _: print(f"\nAdjacency matrix:\n{self.graph.display_adjacency()}"),
                 color=pyxel.COLOR_ORANGE,
                 color_clicked=pyxel.COLOR_WHITE,
+                sound="T120 L4 Q10 V8 <C",
                 font=defaults.FONT_BIG_BLUE,
                 margin=(10.0, 10.0),
             ),
@@ -76,6 +78,18 @@ class App:
                 lambda _: self.graph.default_position(100.0 + self.graph.card),
                 color=pyxel.COLOR_CYAN,
                 color_clicked=pyxel.COLOR_WHITE,
+                sound="T120 L4 Q10 V8 <C#",
+                font=defaults.FONT_BIG_BLUE,
+                margin=(10.0, 10.0),
+            ),
+            buttons.Button(
+                (10.0, 140.0),
+                (140.0, 30.0),
+                ["Weights."],
+                lambda _: self.graph.toggle_weight_visibility(),
+                color=pyxel.COLOR_GRAY,
+                color_clicked=pyxel.COLOR_WHITE,
+                sound="T120 L4 Q10 V8 D",
                 font=defaults.FONT_BIG_BLUE,
                 margin=(10.0, 10.0),
             ),
@@ -96,8 +110,6 @@ class App:
         ))
 
         self.graph.default_position(100.0 + self.graph.card)
-
-        print(self.graph.display_register())
 
     def run(self) -> None:
         """

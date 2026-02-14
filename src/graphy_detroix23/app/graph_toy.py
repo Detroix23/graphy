@@ -21,6 +21,7 @@ class GraphToy:
     selected: node_toy.NodeToy | None
     arc_origin: node_toy.NodeToy | None
     _last_added: str | None
+    show_weights: bool
 
     def __init__(self, parent: 'base.App') -> None:
         self.parent = parent
@@ -28,6 +29,7 @@ class GraphToy:
         self.selected = None
         self.arc_origin = None
         self._last_added = None
+        self.show_weights = True
     
     def __getitem__(self, name: str) -> node_toy.NodeToy:
         """
@@ -41,6 +43,12 @@ class GraphToy:
         Returns the _Card_, or the number total of nodes.
         """
         return len(self._register)
+
+    def toggle_weight_visibility(self) -> None:
+        """
+        Toggle on or off the `show_weight` boolean.
+        """
+        self.show_weights = not self.show_weights
 
     def add(
         self, 
@@ -142,6 +150,8 @@ class GraphToy:
                 self.set_selection(self.select_node((pyxel.mouse_x, pyxel.mouse_y)))
         
         else:
+            notes: list[str] = ["F", "A", "C", "E-"]
+            pyxel.play(0, f"T120 L4 Q30 V8 {notes[int(pyxel.frame_count / 2) % 4]}")
             if pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):
                 self.set_selection(None)
         
@@ -166,10 +176,21 @@ class GraphToy:
                 if end is not None:
                     if end in self.arc_origin.get_next():
                         self.arc_origin.remove_next(end)
+                        pyxel.play(0, "T180 L8 Q100 V32 <A-")
                     else:
                         self.arc_origin.set_next(end, 1.0)
+                        pyxel.play(0, "T180 L8 Q100 V32 E")
+
+                else:
+                    # Empty
+                    pyxel.play(0, "T180 L8 Q100 V32 <<B-")
 
                 self.set_arc_origin(None)
+            
+            else:
+                # Drawing.
+                notes: list[str] = ["C", "E", "G", "<B-"]
+                pyxel.play(0, f"T80 L1 Q100 V8 {notes[int(pyxel.frame_count / 2) % 4]}")
 
     def node_creation(self) -> None:
         """
@@ -179,9 +200,12 @@ class GraphToy:
             selection: node_toy.NodeToy | None = self.select_node((pyxel.mouse_x, pyxel.mouse_y))
             if selection is None:
                 self.add_continuing((pyxel.mouse_x, pyxel.mouse_y))
+                pyxel.play(0, "T180 L8 Q100 V32 C")
 
             else:
                 self.remove(selection.get_name())
+                pyxel.play(0, "T180 L8 Q100 V32 <F")
+            
 
     def update(self) -> None:
         """
@@ -211,7 +235,7 @@ class GraphToy:
 
             
         for node in self._register.values():
-            node.draw()
+            node.draw(self.show_weights)
     
     def display_register(self) -> str:
         """
