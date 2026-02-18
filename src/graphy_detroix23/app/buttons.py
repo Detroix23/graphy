@@ -8,17 +8,20 @@ from typing import Callable, Self
 
 import pyxel
 
+from graphy_detroix23.modules import sound
+
 class Button:
     """
     # Interactive `Button` class.
     """
+
     position: tuple[float, float]
     size: tuple[float, float]
     text: list[str]
     action: Callable[[Self], None]
     color: int
     color_clicked: int
-    sound: str | None
+    sound: sound.MML | None
     font: pyxel.Font | None
     margin: tuple[float, float]
     # Duration in frames.
@@ -33,7 +36,7 @@ class Button:
         action: Callable[[Self], None],
         color: int,
         color_clicked: int = pyxel.COLOR_WHITE,
-        sound: str | None = None,
+        sound: sound.MML | None = None,
         font: pyxel.Font | None = None,
         margin: tuple[float, float] = (0.0, 0.0)
     ) -> None:
@@ -101,7 +104,7 @@ class Button:
                 self._click_time = self._click_effect_duration
                 
                 if self.sound is not None:
-                    pyxel.play(1, self.sound)
+                    self.sound.play()
 
         if self._click_time > 0:
             self._click_time -= 1

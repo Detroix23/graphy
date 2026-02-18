@@ -44,8 +44,17 @@ class Signature(enum.Enum):
     - `FLAT` **♭**.
     """
     NONE = 0
+    """
+    No signature at all, natural **♮**. +0 ½ tones
+    """
     SHARP = 1
+    """
+    Sharp **♯**, +1 ½ tones
+    """
     FLAT = 2
+    """
+    Flat **♭**, -1 ½ tones.
+    """
 
 
 class Note:
@@ -77,11 +86,13 @@ class Note:
         self.signature = signature
         self.set_note_index(self)
 
+        # print(f"Note.__init__({degree_index}, {octave}, {signature}) {self.__str__()}")
+
     def set_note_index(self, note: 'Note') -> int:
         """
         Get and set `note_index` from a `Note`.
         """
-        self._note_index = note.degree_index
+        self._note_index = NOTE.index(DEGREES[note.degree_index])
         if note.signature == Signature.FLAT:
             self.increment_pitch(-1)
         elif note.signature == Signature.SHARP:
@@ -223,11 +234,13 @@ class Incrementing(MML):
         """
         Use `pyxel` to `play` the MML string and update the next note.
         """
-        pyxel.play(self.channel, self.__str__(), loop=self.loop)
-
-        self._index = (self._index + 1) % len(self.scale)     
         if self._index == 0:
             self.notes[0].octave = self.start_note.octave
             self.notes[0].set_note_index(self.start_note)
-        else:
-            self.notes[0].increment_pitch(self.scale[self._index])
+        
+        self.notes[0].increment_pitch(self.scale[self._index])
+
+        # print(self._index, self.__str__(), self.scale[self._index])
+        pyxel.play(self.channel, self.__str__(), loop=self.loop)
+
+        self._index = (self._index + 1) % len(self.scale)     

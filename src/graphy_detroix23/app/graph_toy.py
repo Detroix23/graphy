@@ -9,7 +9,7 @@ import pyxel
 
 if TYPE_CHECKING:
     from graphy_detroix23.app import base
-from graphy_detroix23.modules import graphics, sound
+from graphy_detroix23.modules import defaults, graphics, sound
 from graphy_detroix23.app import mouse, node_toy
 
 class GraphToy:
@@ -44,7 +44,7 @@ class GraphToy:
             length=100, 
             velocity=32, 
             start_note=sound.Note("C"), 
-            scale=[1] * 10,
+            scale=defaults.SCALE_BOOGIE_2,
         )
         self.sound_node_removal = sound.Incrementing(
             channel=0, 
@@ -53,7 +53,7 @@ class GraphToy:
             length=100, 
             velocity=32, 
             start_note=sound.Note("F", octave=-1), 
-            scale=[1] * 10,
+            scale=defaults.SCALE_MAJOR_2,
         )
         self.sound_node_connection = sound.Incrementing(
             channel=0, 
@@ -62,7 +62,7 @@ class GraphToy:
             length=100, 
             velocity=32, 
             start_note=sound.Note("E"), 
-            scale=[1] * 10,
+            scale=defaults.SCALE_ALL,
         )
         self.sound_node_disconnection = sound.Incrementing(
             channel=0, 
@@ -71,7 +71,15 @@ class GraphToy:
             length=100, 
             velocity=32, 
             start_note=sound.Note("A", octave=-1, signature=sound.Signature.FLAT), 
-            scale=[1] * 10,
+            scale=defaults.SCALE_ALL,
+        )
+        self.sound_node_connection_fail = sound.MML(
+            channel=0,
+            tempo=180,
+            division=8,
+            length=100,
+            velocity=32,
+            notes=[sound.Note("B", octave=-2, signature=sound.Signature.FLAT)]
         )
 
     def __getitem__(self, name: str) -> node_toy.NodeToy:
@@ -225,8 +233,7 @@ class GraphToy:
                         self.sound_node_connection.play()
 
                 else:
-                    # Empty
-                    pyxel.play(0, "T180 L8 Q100 V32 <<B-")
+                    self.sound_node_connection_fail.play()
 
                 self.set_arc_origin(None)
             
