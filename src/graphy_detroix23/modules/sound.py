@@ -75,11 +75,19 @@ class Note:
             self.degree_index = degree_index
         
         self.signature = signature
-        self._note_index = self.degree_index
-        if self.signature == Signature.FLAT:
+        self.set_note_index(self)
+
+    def set_note_index(self, note: 'Note') -> int:
+        """
+        Get and set `note_index` from a `Note`.
+        """
+        self._note_index = note.degree_index
+        if note.signature == Signature.FLAT:
             self.increment_pitch(-1)
-        elif self.signature == Signature.SHARP:
+        elif note.signature == Signature.SHARP:
             self.increment_pitch(1)
+
+        return self._note_index
 
     def __str__(self) -> str:
         octave: str = ""
@@ -89,6 +97,16 @@ class Note:
             octave = self.OCTAVE_UNDER * abs(self.octave)
 
         return f"{octave}{self.note}"
+
+    def clone(self) -> 'Note':
+        """
+        Do a deep clone of `self` `Note`.
+        """
+        return Note(
+            self.degree_index,
+            self.octave,
+            self.signature,
+        )
 
     @property
     def note(self) -> str:
@@ -182,8 +200,8 @@ class Incrementing(MML):
     # `Incrementing` pitch MML sequence. 
     """
     start_note: Note
-    pitch_increment: int
-    loop_length: int
+    scale: list[int]
+    _index: int
 
     def __init__(
         self, 
@@ -193,20 +211,23 @@ class Incrementing(MML):
         length: int, 
         velocity: int, 
         start_note: Note,
-        pitch_increment: int,
-        loop_length: int,
+        scale: list[int],
         loop: bool = False,
     ) -> None:
-        super().__init__(channel, tempo, division, length, velocity, [start_note], loop)
+        super().__init__(channel, tempo, division, length, velocity, [start_note.clone()], loop)
         self.start_note = start_note
-        self.pitch_increment = pitch_increment
-        self.loop_length = loop_length
+        self.scale = scale
+        self._index = 0
     
     def play(self) -> None:
         """
         Use `pyxel` to `play` the MML string and update the next note.
         """
         pyxel.play(self.channel, self.__str__(), loop=self.loop)
-        self.notes[0].increment_pitch(self.pitch_increment)
 
-        print(str(self.notes[0]))
+        self._index = (self._index + 1) % len(self.scale)     
+        if self._index == 0:
+            self.notes[0].octave = self.start_note.octave
+            self.notes[0].set_note_index(self.start_note)
+        else:
+            self.notes[0].increment_pitch(self.scale[self._index])

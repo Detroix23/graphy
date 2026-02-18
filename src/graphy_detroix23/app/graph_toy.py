@@ -44,8 +44,7 @@ class GraphToy:
             length=100, 
             velocity=32, 
             start_note=sound.Note("C"), 
-            pitch_increment=1, 
-            loop_length=1000,
+            scale=[1] * 10,
         )
         self.sound_node_removal = sound.Incrementing(
             channel=0, 
@@ -54,8 +53,7 @@ class GraphToy:
             length=100, 
             velocity=32, 
             start_note=sound.Note("F", octave=-1), 
-            pitch_increment=-1, 
-            loop_length=10,
+            scale=[1] * 10,
         )
         self.sound_node_connection = sound.Incrementing(
             channel=0, 
@@ -64,8 +62,7 @@ class GraphToy:
             length=100, 
             velocity=32, 
             start_note=sound.Note("E"), 
-            pitch_increment=1, 
-            loop_length=10,
+            scale=[1] * 10,
         )
         self.sound_node_disconnection = sound.Incrementing(
             channel=0, 
@@ -74,8 +71,7 @@ class GraphToy:
             length=100, 
             velocity=32, 
             start_note=sound.Note("A", octave=-1, signature=sound.Signature.FLAT), 
-            pitch_increment=-1, 
-            loop_length=10,
+            scale=[1] * 10,
         )
 
     def __getitem__(self, name: str) -> node_toy.NodeToy:
