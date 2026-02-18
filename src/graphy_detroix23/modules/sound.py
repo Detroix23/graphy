@@ -25,11 +25,15 @@ C16D2&8<GB16B& B16R4.>C<BA>CC16& C16<B2&8>GGD16& D16C8.<B8.A>C4C8.& C16D4&16<G16
 """Example of an MML string."""
 
 DEGREES: Final[list[str]] = ["A", "B", "C", "D", "E", "F", "G"]
-NOTE: Final[list[str]] = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-NOTE_REVERSED: Final[list[str]] = ['G#', 'G', 'F#', 'F', 'E', 'D#', 'D', 'C#', 'C', 'B', 'A#', 'A']
-# Bi-directional arpeggio.
-BIARPEGGIO: Final[list[str]] = NOTE[1:] + NOTE_REVERSED[1:]
-
+NOTE: Final[list[str]] = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+NOTE_REVERSED: Final[list[str]] = ['B', 'A#', 'A', 'G#', 'G', 'F#', 'F', 'E', 'D#', 'D', 'C#', 'C']
+BIARPEGGIO: Final[list[str]] = [
+    "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#",
+    'B', 'A#', 'A', 'G#', 'G', 'F#', 'F', 'E', 'D#', 'D', 'C#',
+]
+"""
+Bi-directional arpeggio, from _A♯_, by _G_, to _A_.
+"""
 
 class Signature(enum.Enum):
     """
@@ -56,6 +60,7 @@ class Note:
     octave: int
     degree_index: int
     signature: Signature
+    _note_index: int
 
     def __init__(
         self, 
@@ -68,7 +73,13 @@ class Note:
             self.degree_index = DEGREES.index(degree_index)
         else:
             self.degree_index = degree_index
+        
         self.signature = signature
+        self._note_index = self.degree_index
+        if self.signature == Signature.FLAT:
+            self.increment_pitch(-1)
+        elif self.signature == Signature.SHARP:
+            self.increment_pitch(1)
 
     def __str__(self) -> str:
         octave: str = ""
@@ -77,13 +88,23 @@ class Note:
         elif self.octave < 0:
             octave = self.OCTAVE_UNDER * abs(self.octave)
 
+        return f"{octave}{self.note}"
+
+    @property
+    def note(self) -> str:
+        """
+        Returns the `str` representation of the _note_, without octave.
+        """
+        """
         signature: str = ""
         if self.signature == Signature.FLAT:
             signature = "-"
         elif self.signature == Signature.SHARP:
             signature = "#"
-
-        return f"{octave}{self.degree}{signature}"
+        
+        return f"{self.degree}{signature}"
+        """
+        return NOTE[self._note_index]
 
     @property
     def degree(self) -> str:
@@ -91,6 +112,20 @@ class Note:
         Get the letter from `degree_index`.
         """
         return DEGREES[self.degree_index]
+
+    def increment_pitch(self, value: int) -> None:
+        """
+        Increment the _note_ by a `value`, and eventually the `octave`.
+        """
+        index: int = self._note_index + value
+        self.octave += index // len(NOTE)
+        self._note_index = index % len(NOTE)
+
+    def increment_degree(self, value: int) -> None:
+        """
+        Increment the `degree` by a `value`.
+        """
+        self.degree_index = (self.degree_index + value) % len(DEGREES)
 
 
 class MML:
@@ -149,7 +184,6 @@ class Incrementing(MML):
     start_note: Note
     pitch_increment: int
     loop_length: int
-    _incremented: int
 
     def __init__(
         self, 
@@ -167,13 +201,12 @@ class Incrementing(MML):
         self.start_note = start_note
         self.pitch_increment = pitch_increment
         self.loop_length = loop_length
-        self._incremented = 0
     
     def play(self) -> None:
         """
         Use `pyxel` to `play` the MML string and update the next note.
         """
         pyxel.play(self.channel, self.__str__(), loop=self.loop)
-        
-        self._incremented = (self._incremented + 1) % self.loop_length
-        self.notes[0].degree_index = (self._incremented * self.pitch_increment) % len(DEGREES)
+        self.notes[0].increment_pitch(self.pitch_increment)
+
+        print(str(self.notes[0]))

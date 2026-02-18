@@ -45,7 +45,7 @@ class GraphToy:
             velocity=32, 
             start_note=sound.Note("C"), 
             pitch_increment=1, 
-            loop_length=3,
+            loop_length=1000,
         )
         self.sound_node_removal = sound.Incrementing(
             channel=0, 
