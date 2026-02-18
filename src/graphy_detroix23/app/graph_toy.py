@@ -9,7 +9,7 @@ import pyxel
 
 if TYPE_CHECKING:
     from graphy_detroix23.app import base
-from graphy_detroix23.modules import graphics
+from graphy_detroix23.modules import graphics, sound
 from graphy_detroix23.app import mouse, node_toy
 
 class GraphToy:
@@ -23,6 +23,12 @@ class GraphToy:
     _last_added: str | None
     show_weights: bool
 
+    sound_node_creation: sound.Incrementing
+    sound_node_removal: sound.Incrementing
+    sound_node_connection: sound.Incrementing
+    sound_node_disconnection: sound.Incrementing
+
+
     def __init__(self, parent: 'base.App') -> None:
         self.parent = parent
         self._register = dict()
@@ -30,7 +36,48 @@ class GraphToy:
         self.arc_origin = None
         self._last_added = None
         self.show_weights = True
-    
+
+        self.sound_node_creation = sound.Incrementing(
+            channel=0, 
+            tempo=180, 
+            division=8, 
+            length=100, 
+            velocity=32, 
+            start_note=sound.Note("C"), 
+            pitch_increment=1, 
+            loop_length=3,
+        )
+        self.sound_node_removal = sound.Incrementing(
+            channel=0, 
+            tempo=180, 
+            division=8, 
+            length=100, 
+            velocity=32, 
+            start_note=sound.Note("F", octave=-1), 
+            pitch_increment=-1, 
+            loop_length=10,
+        )
+        self.sound_node_connection = sound.Incrementing(
+            channel=0, 
+            tempo=180, 
+            division=8, 
+            length=100, 
+            velocity=32, 
+            start_note=sound.Note("E"), 
+            pitch_increment=1, 
+            loop_length=10,
+        )
+        self.sound_node_disconnection = sound.Incrementing(
+            channel=0, 
+            tempo=180, 
+            division=8, 
+            length=100, 
+            velocity=32, 
+            start_note=sound.Note("A", octave=-1, signature=sound.Signature.FLAT), 
+            pitch_increment=-1, 
+            loop_length=10,
+        )
+
     def __getitem__(self, name: str) -> node_toy.NodeToy:
         """
         Return a `node_toy.NodeToy` named `name`. Raise if it doesn't exist.
@@ -176,10 +223,10 @@ class GraphToy:
                 if end is not None:
                     if end in self.arc_origin.get_next():
                         self.arc_origin.remove_next(end)
-                        pyxel.play(0, "T180 L8 Q100 V32 <A-")
+                        self.sound_node_disconnection.play()
                     else:
                         self.arc_origin.set_next(end, 1.0)
-                        pyxel.play(0, "T180 L8 Q100 V32 E")
+                        self.sound_node_connection.play()
 
                 else:
                     # Empty
@@ -200,12 +247,11 @@ class GraphToy:
             selection: node_toy.NodeToy | None = self.select_node((pyxel.mouse_x, pyxel.mouse_y))
             if selection is None:
                 self.add_continuing((pyxel.mouse_x, pyxel.mouse_y))
-                pyxel.play(0, "T180 L8 Q100 V32 C")
+                self.sound_node_creation.play()
 
             else:
                 self.remove(selection.get_name())
-                pyxel.play(0, "T180 L8 Q100 V32 <F")
-            
+                self.sound_node_removal.play()
 
     def update(self) -> None:
         """
